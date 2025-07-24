@@ -61,10 +61,10 @@ const EmployeeManagement = () => {
   };
 
   return (
-    <div className="p-8 bg-gradient-to-br from-blue-50 to-white min-h-screen flex-1">
-      <div className="bg-white border border-blue-100 rounded-2xl p-8 shadow-xl w-full">
+    <div className="p-2 md:p-8 bg-gradient-to-br from-blue-50 to-white min-h-screen w-full">
+      <div className="bg-white border border-blue-100 rounded-2xl p-2 md:p-8 shadow-xl w-full">
         <h1 className="text-3xl font-bold text-blue-700 mb-8">Employees</h1>
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
           <div>
             <h1 className="text-2xl font-bold">Employee Management</h1>
             <p className="text-gray-600">Manage employees and assign inventory</p>
@@ -86,6 +86,7 @@ const EmployeeManagement = () => {
         {/* Tabs */}
         <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
         {/* Views */}
+        <div className="overflow-x-auto w-full">
         {activeTab === 'employees' && (
           <EmployeeTable
             employees={employees}
@@ -100,6 +101,7 @@ const EmployeeManagement = () => {
         {activeTab === 'notifications' && (
           <div>🔔 Notifications List</div>
         )}
+        </div>
         {/* Modals */}
         {showAddModal && (
           <AddEmployeeModal

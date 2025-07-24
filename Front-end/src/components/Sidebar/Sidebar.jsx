@@ -46,7 +46,7 @@ const Sidebar = () => {
       />
       {/* Sidebar */}
       <aside
-        className={`fixed z-40 top-0 left-0 h-full bg-gradient-to-b from-blue-700 via-blue-600 to-blue-500 border-r border-blue-800 shadow-2xl flex flex-col transition-all duration-300
+        className={`fixed z-40 top-0 left-0 h-full overflow-y-auto bg-gradient-to-b from-blue-700 via-blue-600 to-blue-500 border-r border-blue-800 shadow-2xl flex flex-col transition-all duration-300
           w-80
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
           md:translate-x-0 md:static md:flex md:w-80
