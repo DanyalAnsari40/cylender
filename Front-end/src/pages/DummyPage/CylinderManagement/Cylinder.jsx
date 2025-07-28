@@ -7,7 +7,6 @@ import SignatureModal from './Signature';
 import { LuReceiptText } from "react-icons/lu";
 import DepositInvoice from './DepositInvoice';
 import RefillInvoice from './RefillInvoice';
-import ReturnInvoice from './ReturnInvoice';
 import Button from '../../../components/Button';
 import { 
   fetchCylinders, 
@@ -213,14 +212,6 @@ const handledeleteReturn = (id) => {
             <td className="p-2 flex gap-2">
               <Button
                 size="sm"
-                variant="secondary"
-                onClick={() => handleGenerateReceipt(ret, 'return')}
-                title="Generate Receipt"
-              >
-                <LuReceiptText />
-              </Button>
-              <Button
-                size="sm"
                 variant="danger"
                 onClick={() => handledeleteReturn(ret._id)}
                 title="Delete Return"
@@ -325,19 +316,6 @@ const handledeleteReturn = (id) => {
 
 {signatureImage && selectedItem && selectedType === 'refill' && (
   <RefillInvoice
-    invoiceData={generateInvoiceData(selectedItem)}
-    signature={signatureImage}
-    onEdit={handleEditSignature}
-    onClose={() => {
-      setSignatureImage(null);
-      setSelectedItem(null);
-      setSelectedType(null);
-    }}
-  />
-)}
-
-{signatureImage && selectedItem && selectedType === 'return' && (
-  <ReturnInvoice
     invoiceData={generateInvoiceData(selectedItem)}
     signature={signatureImage}
     onEdit={handleEditSignature}

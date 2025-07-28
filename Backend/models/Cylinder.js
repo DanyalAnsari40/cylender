@@ -7,6 +7,9 @@ const DepositSchema = new mongoose.Schema({
   paymentMethod: { type: String, required: true },
   checkNumber: String,
   bankName: String,
+  cashAmount: Number,
+  category: { type: String, required: true },
+  itemName: { type: String, required: true },
 });
 
 const Cylinder = mongoose.model('Cylinder', DepositSchema);

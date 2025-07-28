@@ -15,6 +15,9 @@ const DepositForm = ({ onClose }) => {
     paymentMethod: 'Cash',
     checkNumber: '',
     bankName: '',
+    cashAmount: '',
+    category: '',
+    itemName: '',
   });
 
   useEffect(() => {
@@ -43,9 +46,17 @@ const DepositForm = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-30">
-      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg border border-blue-100">
+      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg border border-blue-100 relative">
+        {/* Cross Icon */}
+        <button
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl"
+          onClick={onClose}
+          aria-label="Close"
+        >
+          &times;
+        </button>
         <h2 className="text-2xl font-bold mb-6 text-blue-700">New Cylinder Deposit</h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Customer Selection */}
           <div>
             <label className="block mb-1 font-medium text-gray-700">Customer</label>
@@ -106,6 +117,37 @@ const DepositForm = ({ onClose }) => {
               <option value="Cheque">Cheque</option>
             </select>
           </div>
+          {/* Category */}
+          <div>
+            <label className="block mb-1 font-medium text-gray-700">Category</label>
+            <select
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              required
+              className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+            >
+              <option value="">Select Category</option>
+              <option value="Gas">Gas</option>
+              <option value="Cylinder">Cylinder</option>
+            </select>
+          </div>
+          {/* Cash Amount - only show if payment method is Cash */}
+          {formData.paymentMethod === 'Cash' && (
+            <div>
+              <label className="block mb-1 font-medium text-gray-700">Cash Amount</label>
+              <input
+                type="number"
+                name="cashAmount"
+                value={formData.cashAmount}
+                onChange={handleChange}
+                min="0"
+                required
+                className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                placeholder="Enter cash amount"
+              />
+            </div>
+          )}
           {/* Cheque Details */}
           {formData.paymentMethod === 'Cheque' && (
             <>
@@ -133,8 +175,21 @@ const DepositForm = ({ onClose }) => {
               </div>
             </>
           )}
+          {/* Item Name */}
+          <div>
+            <label className="block mb-1 font-medium text-gray-700">Item Name</label>
+            <input
+              type="text"
+              name="itemName"
+              value={formData.itemName}
+              onChange={handleChange}
+              required
+              className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+              placeholder="Enter item name"
+            />
+          </div>
           {/* Action Buttons */}
-          <div className="flex justify-end gap-2">
+          <div className="md:col-span-2 flex justify-end gap-2">
             <button type="button" onClick={onClose} className="bg-gray-200 px-6 py-3 rounded-xl font-semibold">Cancel</button>
             <button type="submit" className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">Deposit</button>
           </div>

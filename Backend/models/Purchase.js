@@ -13,6 +13,7 @@ const purchaseSchema = new mongoose.Schema({
   gasPricePerKg: Number,
   cylinderCount: Number,
   cylinderPrice: Number,
+  productName: String,
 });
 
 export default mongoose.model('Purchase', purchaseSchema);

@@ -50,6 +50,7 @@ const GasSales = () => {
                 <th className="p-2 md:p-3 font-semibold">Invoice #</th>
                 <th className="p-2 md:p-3 font-semibold">Customer</th>
                 <th className="p-2 md:p-3 font-semibold">Date</th>
+                <th className="p-2 md:p-3 font-semibold">Categories</th>
                 <th className="p-2 md:p-3 font-semibold">Paid</th>
                 <th className="p-2 md:p-3 font-semibold">Pending</th>
                 <th className="p-2 md:p-3 font-semibold">Status</th>
@@ -58,35 +59,56 @@ const GasSales = () => {
             <tbody>
               {paginatedSales.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-8 text-gray-400">No sales found.</td>
+                  <td colSpan={7} className="text-center py-8 text-gray-400">No sales found.</td>
                 </tr>
               ) : (
-                paginatedSales.map((s, index) => (
-                  <tr key={s.id || s.invoice || index} className={`border-b ${index % 2 === 0 ? 'bg-white' : 'bg-blue-50'} hover:bg-blue-100 transition`}>
-                    <td className="p-2 md:p-3 font-medium">{s.invoice}</td>
-                    <td className="p-2 md:p-3">{s.customer}</td>
-                    <td className="p-2 md:p-3">{s.date}</td>
-                    <td className="p-2 md:p-3">AED {parseFloat(s.paid).toFixed(2)}</td>
-                    <td className="p-2 md:p-3">
-                      {s.due > 0 ? (
-                        <span className="text-red-600 font-semibold">AED {s.due.toFixed(2)}</span>
-                      ) : (
-                        <span className="text-green-600 font-semibold">-</span>
-                      )}
-                    </td>
-                    <td className="p-2 md:p-3">
-                      <span
-                        className={`px-3 py-1 text-xs rounded-full font-bold shadow-sm ${
-                          s.status === 'paid'
-                            ? 'bg-green-100 text-green-900'
-                            : 'bg-yellow-100 text-yellow-700'
-                        }`}
-                      >
-                        {s.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))
+                paginatedSales.map((s, index) => {
+                  // Get unique categories from products
+                  const categories = s.products ? [...new Set(s.products.map(p => p.category))] : [];
+                  
+                  return (
+                    <tr key={s.id || s.invoice || index} className={`border-b ${index % 2 === 0 ? 'bg-white' : 'bg-blue-50'} hover:bg-blue-100 transition`}>
+                      <td className="p-2 md:p-3 font-medium">{s.invoice}</td>
+                      <td className="p-2 md:p-3">{s.customer}</td>
+                      <td className="p-2 md:p-3">{s.date}</td>
+                      <td className="p-2 md:p-3">
+                        <div className="flex flex-wrap gap-1">
+                          {categories.map((category, idx) => (
+                            <span
+                              key={idx}
+                              className={`px-2 py-1 text-xs rounded-full font-bold ${
+                                category === 'gas' 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : 'bg-blue-100 text-blue-800'
+                              }`}
+                            >
+                              {category}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="p-2 md:p-3">AED {parseFloat(s.paid).toFixed(2)}</td>
+                      <td className="p-2 md:p-3">
+                        {s.due > 0 ? (
+                          <span className="text-red-600 font-semibold">AED {s.due.toFixed(2)}</span>
+                        ) : (
+                          <span className="text-green-600 font-semibold">-</span>
+                        )}
+                      </td>
+                      <td className="p-2 md:p-3">
+                        <span
+                          className={`px-3 py-1 text-xs rounded-full font-bold shadow-sm ${
+                            s.status === 'paid'
+                              ? 'bg-green-100 text-green-900'
+                              : 'bg-yellow-100 text-yellow-700'
+                          }`}
+                        >
+                          {s.status}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

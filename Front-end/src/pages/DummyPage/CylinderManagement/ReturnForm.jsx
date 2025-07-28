@@ -6,23 +6,17 @@ const ReturnForm = ({ onClose }) => {
   const dispatch = useDispatch();
   const deposits = useSelector((state) => state.cylinders.deposits);
 
-  const [selectedDepositId, setSelectedDepositId] = useState('');
-
-  const selectedDeposit = deposits.find((d) => d._id === selectedDepositId); // ✅ Use _id
+  const [formData, setFormData] = useState({
+    customer: '',
+    cylinderType: '',
+    quantity: 1,
+    returnDate: new Date().toISOString().split('T')[0],
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!selectedDeposit) return;
-
-    // ✅ Clean return payload
-    const returnData = {
-      customer: selectedDeposit.customer,
-      cylinderType: selectedDeposit.cylinderType,
-      quantity: selectedDeposit.quantity,
-      returnDate: new Date().toISOString().split('T')[0],
-    };
-
-    dispatch(addReturn(returnData));
+    if (!formData.customer || !formData.cylinderType || !formData.quantity || !formData.returnDate) return;
+    dispatch(addReturn(formData));
     onClose();
   };
 
@@ -39,8 +33,8 @@ const ReturnForm = ({ onClose }) => {
             required
           >
             <option value="">Select Customer</option>
-            {customers.map((c) => (
-              <option key={c.id} value={c.name}>{c.name}</option>
+            {deposits.map((d) => (
+              <option key={d._id} value={d.customer}>{d.customer}</option>
             ))}
           </select>
           {/* Cylinder Type Dropdown */}
@@ -51,8 +45,11 @@ const ReturnForm = ({ onClose }) => {
             required
           >
             <option value="">Select Cylinder Type</option>
-            <option value="Small">Small</option>
-            <option value="Large">Large</option>
+            {deposits
+              .filter((d) => d.customer === formData.customer)
+              .map((d) => (
+                <option key={d._id} value={d.cylinderType}>{d.cylinderType}</option>
+              ))}
           </select>
           {/* Quantity Input */}
           <input

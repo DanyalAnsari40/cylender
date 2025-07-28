@@ -4,6 +4,11 @@ const productSchema = new mongoose.Schema({
   name: String,
   quantity: Number,
   price: Number,
+  category: {
+    type: String,
+    enum: ['gas', 'cylinder'],
+    required: true
+  }
 });
 
 const saleSchema = new mongoose.Schema({

@@ -15,9 +15,7 @@ const CustomerManagement = () => {
     trn: '',
     phone: '',
     email: '',
-    totalPurchases: 0,
-    outstanding: 0,
-    lastPurchase: '',
+    address: '',
   });
 
   const fetchCustomers = async () => {
@@ -65,9 +63,7 @@ const CustomerManagement = () => {
       trn: '',
       phone: '',
       email: '',
-      totalPurchases: 0,
-      outstanding: 0,
-      lastPurchase: '',
+      address: '',
     });
     setShowForm(false);
     setIsEditing(false);
@@ -90,12 +86,10 @@ const CustomerManagement = () => {
             <h2 className="text-2xl font-bold mb-6 text-blue-700">{isEditing ? 'Edit Customer' : 'Add Customer'}</h2>
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input name="name" value={formData.name} onChange={handleChange} label="Customer Name" placeholder="Customer Name" required />
-              <Input name="trn" value={formData.trn} onChange={handleChange} label="TRN Number" placeholder="TRN Number" required />
+              <Input name="trn" value={formData.trn} onChange={handleChange} label="TR Number" placeholder="TR Number" required />
               <Input name="phone" value={formData.phone} onChange={handleChange} label="Phone Number" placeholder="Phone Number" required />
               <Input name="email" value={formData.email} onChange={handleChange} label="Email" placeholder="Email" />
-              <Input name="totalPurchases" value={formData.totalPurchases} onChange={handleChange} label="Total Purchases" placeholder="Total Purchases" />
-              <Input name="outstanding" value={formData.outstanding} onChange={handleChange} label="Outstanding" placeholder="Outstanding" />
-              <Input name="lastPurchase" value={formData.lastPurchase} onChange={handleChange} label="Last Purchase (yyyy-mm-dd)" placeholder="Last Purchase (yyyy-mm-dd)" />
+              <Input name="address" value={formData.address} onChange={handleChange} label="Address" placeholder="Address" />
               <div className="col-span-2 flex justify-end gap-2">
                 <Button type="button" variant="secondary" onClick={resetForm} size="md">Cancel</Button>
                 <Button type="submit" variant={isEditing ? 'primary' : 'primary'} size="md">

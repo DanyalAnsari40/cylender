@@ -121,6 +121,7 @@ const InvoicePreview = ({ invoiceData, signature, onEdit, onClose }) => {
           <table>
             <thead>
               <tr style={{ background: '#f1f1f1' }}>
+                <th>Category</th>
                 <th>Description</th>
                 <th>Qty</th>
                 <th>Unit Price</th>
@@ -130,6 +131,9 @@ const InvoicePreview = ({ invoiceData, signature, onEdit, onClose }) => {
             <tbody>
               {invoiceData.products.map((item, idx) => (
                 <tr key={idx}>
+                  <td style={{ textTransform: 'capitalize', fontWeight: 'bold', color: item.category === 'gas' ? '#059669' : '#2563eb' }}>
+                    {item.category}
+                  </td>
                   <td>{item.name}</td>
                   <td>{item.quantity}</td>
                   <td>AED {item.price.toFixed(2)}</td>
@@ -138,6 +142,31 @@ const InvoicePreview = ({ invoiceData, signature, onEdit, onClose }) => {
               ))}
             </tbody>
           </table>
+
+          {/* Category Summary */}
+          <div style={{ marginTop: '16px', padding: '12px', background: '#f8fafc', borderRadius: '4px' }}>
+            <h4 style={{ fontWeight: 'bold', marginBottom: '8px' }}>Category Summary:</h4>
+            {(() => {
+              const categoryTotals = invoiceData.products.reduce((acc, item) => {
+                const category = item.category;
+                if (!acc[category]) {
+                  acc[category] = { count: 0, total: 0 };
+                }
+                acc[category].count += item.quantity;
+                acc[category].total += item.quantity * item.price;
+                return acc;
+              }, {});
+
+              return Object.entries(categoryTotals).map(([category, data]) => (
+                <div key={category} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <span style={{ textTransform: 'capitalize', fontWeight: 'bold', color: category === 'gas' ? '#059669' : '#2563eb' }}>
+                    {category}: {data.count} items
+                  </span>
+                  <span>AED {data.total.toFixed(2)}</span>
+                </div>
+              ));
+            })()}
+          </div>
 
           {/* Totals */}
           <div style={{ textAlign: 'right', marginTop: '16px' }}>

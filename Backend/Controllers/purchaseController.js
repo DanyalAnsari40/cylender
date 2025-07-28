@@ -26,6 +26,7 @@ export const addPurchase = async (req, res) => {
       gasPricePerKg,
       cylinderCount,
       cylinderPrice,
+      productName,
     } = req.body;
 
     const newPurchase = new Purchase({
@@ -41,6 +42,7 @@ export const addPurchase = async (req, res) => {
       gasPricePerKg,
       cylinderCount,
       cylinderPrice,
+      productName,
     });
 
     const savedPurchase = await newPurchase.save();

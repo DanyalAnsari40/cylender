@@ -31,6 +31,7 @@ const App = () => {
   const [gasPricePerKg, setGasPricePerKg] = useState('');
   const [cylinderCount, setCylinderCount] = useState('');
   const [cylinderPrice, setCylinderPrice] = useState('');
+  const [productName, setProductName] = useState('');
 
   useEffect(() => {
     dispatch(fetchSuppliers());
@@ -67,6 +68,7 @@ const App = () => {
       gasPricePerKg: selectedGas === 'Gas' ? gasPricePerKg : null,
       cylinderCount: selectedGas === 'Cylinder' ? cylinderCount : null,
       cylinderPrice: selectedGas === 'Cylinder' ? cylinderPrice : null,
+      productName,
     };
 
     dispatch(addPurchase(newPurchase));
@@ -79,6 +81,7 @@ const App = () => {
     setGasPricePerKg('');
     setCylinderCount('');
     setCylinderPrice('');
+    setProductName('');
   };
 
   // ... (the rest of the component remains unchanged)
@@ -244,6 +247,14 @@ const App = () => {
                 value={purchaseDate}
                 onChange={(e) => setPurchaseDate(e.target.value)}
                 label="Purchase Date"
+                required
+              />
+              {/* Product Name */}
+              <Input
+                value={productName}
+                onChange={(e) => setProductName(e.target.value)}
+                label="Product Name"
+                placeholder="Enter product name"
                 required
               />
               {/* Purchase Type */}

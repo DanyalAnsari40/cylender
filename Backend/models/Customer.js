@@ -5,9 +5,7 @@ const customerSchema = new mongoose.Schema({
   trn: String,
   phone: String,
   email: String,
-  totalPurchases: Number,
-  outstanding: Number,
-  lastPurchase: String,
+  address: String,
 }, { timestamps: true });
 
 export default mongoose.model('Customer', customerSchema);
