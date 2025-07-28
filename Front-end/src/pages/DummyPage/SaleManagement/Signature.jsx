@@ -20,6 +20,8 @@ const SignatureModal = ({ invoice, onClose, onConfirm }) => {
   const startDrawing = (e) => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
+    ctx.strokeStyle = '#16a34a'; // green color for signature
+    ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
     canvas.onmousemove = draw;
@@ -39,7 +41,14 @@ const SignatureModal = ({ invoice, onClose, onConfirm }) => {
 
   return (
     <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-40">
-      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg border border-blue-100">
+      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg border border-blue-100 relative">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-3xl font-bold z-10"
+          aria-label="Close signature modal"
+        >
+          &times;
+        </button>
         <h2 className="text-2xl font-bold mb-6 text-blue-700">Signature</h2>
         <p className="text-sm text-gray-500 mb-4">Please add your signature to complete the invoice</p>
 
@@ -70,13 +79,6 @@ const SignatureModal = ({ invoice, onClose, onConfirm }) => {
             Confirm Signature
           </button>
         </div>
-
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 text-gray-600 hover:text-black text-xl"
-        >
-          &times;
-        </button>
       </div>
     </div>
   );

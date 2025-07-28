@@ -178,14 +178,20 @@ const InvoicePreview = ({ invoiceData, signature, onEdit, onClose }) => {
           </div>
 
           {/* Signature */}
-          <div style={{ marginTop: '20px' }}>
-            <p style={{ fontWeight: 'bold' }}>Authorized Signature:</p>
-            {signature ? (
-              <img src={signature} alt="signature" className="signature-img" />
-            ) : (
-              <p style={{ color: '#666', fontStyle: 'italic' }}>No signature captured.</p>
-            )}
-          </div>
+          {signature && (
+            <div style={{ marginTop: '20px' }}>
+              <p style={{ fontWeight: 'bold' }}>Authorized Signature:</p>
+              <div className="mt-4">
+                <img 
+                  src={signature} 
+                  alt="Signature" 
+                  className="border-2 border-green-600 bg-green-50 w-48 h-20 object-contain rounded shadow-md transition-all duration-300" 
+                  style={{ outline: '2px solid #16a34a' }}
+                />
+                <p className="text-xs text-green-700 mt-1 font-semibold">Signature completed</p>
+              </div>
+            </div>
+          )}
 
           {/* Footer Image */}
           <div style={{ marginTop: '40px' }}>

@@ -113,6 +113,12 @@ const GasSales = () => {
                           setSelectedInvoice(s.invoice);
                           setSelectedSale(s);
                         }}
+                        style={{
+                          background: s.signatureImage ? '#16a34a' : '#e5e7eb',
+                          color: s.signatureImage ? '#fff' : '#374151',
+                          border: s.signatureImage ? '2px solid #16a34a' : '2px solid #e5e7eb',
+                          transition: 'all 0.2s',
+                        }}
                       >
                         <TfiReceipt />
                       </Button>

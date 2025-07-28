@@ -161,7 +161,7 @@ const CylinderManagement = () => {
                 onClick={() => handleGenerateReceipt(d, 'deposit')}
                 title="Generate Receipt"
               >
-                <LuReceiptText />
+                <LuReceiptText style={{ color: signatureImage && selectedItem && selectedItem._id === d._id && selectedType === 'deposit' ? '#16a34a' : '#6b7280', transition: 'color 0.2s' }} />
               </Button>
               <Button
                 size="sm"
@@ -194,7 +194,7 @@ const CylinderManagement = () => {
                 onClick={() => handleGenerateReceipt(r, 'refill')}
                 title="Generate Receipt"
               >
-                <LuReceiptText />
+                <LuReceiptText style={{ color: signatureImage && selectedItem && selectedItem._id === r._id && selectedType === 'refill' ? '#16a34a' : '#6b7280', transition: 'color 0.2s' }} />
               </Button>
               <Button
                 size="sm"
