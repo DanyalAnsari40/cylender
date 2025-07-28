@@ -37,3 +37,35 @@ export const updateEmployee = async (req, res) => {
     res.status(500).json({ message: 'Failed to update employee' });
   }
 };
+
+export const assignStock = async (req, res) => {
+  try {
+    const { employeeId, type, qty } = req.body;
+    const employee = await Employee.findById(employeeId);
+    if (!employee) return res.status(404).json({ message: 'Employee not found' });
+    // Find if this type already exists
+    const stockIdx = employee.stock.findIndex(s => s.type === type);
+    if (stockIdx > -1) {
+      // Update qty
+      employee.stock[stockIdx].qty += Number(qty);
+    } else {
+      // Add new type
+      employee.stock.push({ type, qty: Number(qty) });
+    }
+    await employee.save();
+    res.json(employee.stock);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to assign stock' });
+  }
+};
+
+export const getAssignedStock = async (req, res) => {
+  try {
+    const employees = await Employee.find({}, 'name stock');
+    // Return as array of { employeeId, name, stock }
+    const result = employees.map(emp => ({ employeeId: emp._id, name: emp.name, stock: emp.stock }));
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch assigned stock' });
+  }
+};

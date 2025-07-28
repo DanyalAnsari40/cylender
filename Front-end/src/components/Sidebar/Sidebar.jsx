@@ -112,6 +112,7 @@ const Sidebar = () => {
               <SidebarLink icon={<FiTrendingUp />} label="Gas Sales" to="/gas-sales" animate />
               <SidebarLink icon={<FiUsers />} label="Employees" to="/employees" animate />
               <SidebarLink icon={<FiBox />} label="Cylinders" to="/cylinders" animate />
+              <SidebarLink icon={<FiBox />} label="Products" to="/products" animate />
               <SidebarLink icon={<FiFileText />} label="Reports" to="/reports" animate badge={pendingReports} />
             </>
           )}

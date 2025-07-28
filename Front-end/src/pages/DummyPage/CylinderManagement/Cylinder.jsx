@@ -29,6 +29,8 @@ const CylinderManagement = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
   const [signatureImage, setSignatureImage] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteInfo, setDeleteInfo] = useState({ id: null, type: null });
 
   const deposits = useSelector((state) => state.cylinders.deposits || []);
   const refills = useSelector((state) => state.cylinders.refills || []);
@@ -39,23 +41,32 @@ const CylinderManagement = () => {
 
 
 
- const handleDeleteDeposit = (id) => {
-  if (window.confirm("Are you sure you want to delete this deposit?")) {
-    dispatch(deleteDeposit(id)); 
-  }
-};
+  const handleDeleteDeposit = (id) => {
+    setDeleteInfo({ id, type: 'deposit' });
+    setShowDeleteModal(true);
+  };
 
-const handleDeleterefill = (id) => {
-  if (window.confirm("Are you sure you want to delete this refill?")) {
-    dispatch(deleteRefill(id)); 
-  }
-};
+  const handleDeleterefill = (id) => {
+    setDeleteInfo({ id, type: 'refill' });
+    setShowDeleteModal(true);
+  };
 
-const handledeleteReturn = (id) => {
-  if (window.confirm("Are you sure you want to delete this refill?")) {
-    dispatch(deleteReturn(id)); 
-  }
-};
+  const handledeleteReturn = (id) => {
+    setDeleteInfo({ id, type: 'return' });
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = () => {
+    if (deleteInfo.type === 'deposit') dispatch(deleteDeposit(deleteInfo.id));
+    if (deleteInfo.type === 'refill') dispatch(deleteRefill(deleteInfo.id));
+    if (deleteInfo.type === 'return') dispatch(deleteReturn(deleteInfo.id));
+    setShowDeleteModal(false);
+    setDeleteInfo({ id: null, type: null });
+  };
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setDeleteInfo({ id: null, type: null });
+  };
 
 
   useEffect(() => {
@@ -237,6 +248,22 @@ const handledeleteReturn = (id) => {
           <Button onClick={() => setShowReturnForm(true)} size="md" variant="outline">+ Return</Button>
         </div>
       </div>
+      {/* Tab Navigation */}
+      <div className="flex mb-6 gap-2">
+        {['Deposits', 'Refills', 'Returns'].map(tab => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-6 py-3 rounded-t-xl font-semibold focus:outline-none transition-all duration-200 border-b-2 ${
+              activeTab === tab
+                ? 'bg-blue-50 text-blue-700 border-blue-600'
+                : 'bg-gray-100 text-gray-500 border-transparent hover:bg-blue-100'
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
       <div className="bg-white border border-blue-100 rounded-2xl p-8 overflow-x-auto shadow-xl">
         <h2 className="text-2xl font-bold mb-6 text-blue-700">{activeTab} List</h2>
         <table className="min-w-full text-sm text-left">
@@ -325,6 +352,29 @@ const handledeleteReturn = (id) => {
       setSelectedType(null);
     }}
   />
+)}
+
+{showDeleteModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm border border-blue-100 relative animate-fade-in">
+      <h2 className="text-xl font-bold text-red-700 mb-4 text-center">Confirm Delete</h2>
+      <p className="mb-6 text-center">Are you sure you want to delete this {deleteInfo.type}?</p>
+      <div className="flex justify-center gap-4">
+        <button
+          onClick={confirmDelete}
+          className="bg-gradient-to-r from-red-600 to-red-400 hover:from-red-700 hover:to-red-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+        >
+          Delete
+        </button>
+        <button
+          onClick={cancelDelete}
+          className="bg-gray-200 px-6 py-3 rounded-xl font-semibold"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
 )}
 
     </div>

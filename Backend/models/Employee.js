@@ -6,7 +6,12 @@ const employeeSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     status: { type: String, default: 'active' },
-    stock: { type: Number, default: 0 },
+    stock: [
+      {
+        type: { type: String, enum: ['cylinder', 'gas'], required: true },
+        qty: { type: Number, required: true, default: 0 }
+      }
+    ],
     role: { type: String, default: 'employee' } 
   },
   { timestamps: true }

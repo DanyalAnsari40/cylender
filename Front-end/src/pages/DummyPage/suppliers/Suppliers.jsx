@@ -19,6 +19,8 @@ const Suppliers = () => {
 
   const [showForm, setShowForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
 
   const [formData, setFormData] = useState({
     id: '',
@@ -68,6 +70,20 @@ const Suppliers = () => {
     setFormData(supplier);
     setIsEditing(true);
     setShowForm(true);
+  };
+
+  const handleDelete = (id) => {
+    setDeleteId(id);
+    setShowDeleteModal(true);
+  };
+  const confirmDelete = () => {
+    dispatch(deleteSupplier(deleteId));
+    setShowDeleteModal(false);
+    setDeleteId(null);
+  };
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setDeleteId(null);
   };
 
   return (
@@ -148,13 +164,35 @@ const Suppliers = () => {
                 <td className="p-4">{supplier.status}</td>
                 <td className="p-4 flex gap-2">
                   <Button onClick={() => handleEdit(supplier)} size="sm" variant="primary"><FiEdit className="mr-1" /> Edit</Button>
-                  <Button onClick={() => dispatch(deleteSupplier(supplier.id))} size="sm" variant="danger"><FiTrash2 className="mr-1" /> Delete</Button>
+                  <Button onClick={() => handleDelete(supplier.id)} size="sm" variant="danger"><FiTrash2 className="mr-1" /> Delete</Button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm border border-blue-100 relative animate-fade-in">
+            <h2 className="text-xl font-bold text-red-700 mb-4 text-center">Confirm Delete</h2>
+            <p className="mb-6 text-center">Are you sure you want to delete this supplier?</p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={confirmDelete}
+                className="bg-gradient-to-r from-red-600 to-red-400 hover:from-red-700 hover:to-red-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                Delete
+              </button>
+              <button
+                onClick={cancelDelete}
+                className="bg-gray-200 px-6 py-3 rounded-xl font-semibold"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -33,28 +33,36 @@ const RefillForm = ({ onClose }) => {
         <h2 className="text-2xl font-bold mb-6 text-blue-700">Refill Cylinder</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Customer Dropdown */}
-          <select
-            value={formData.customer}
-            onChange={(e) => setFormData({ ...formData, customer: e.target.value })}
-            className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
-            required
-          >
-            <option value="">Select Customer</option>
-            {customers.map((c) => (
-              <option key={c.id} value={c.name}>{c.name}</option>
-            ))}
-          </select>
+          <div>
+            <label htmlFor="customer" className="block mb-1 font-medium text-gray-700">Customer</label>
+            <select
+              id="customer"
+              value={formData.customer}
+              onChange={(e) => setFormData({ ...formData, customer: e.target.value })}
+              className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+              required
+            >
+              <option value="">Select Customer</option>
+              {customers.map((c) => (
+                <option key={c._id} value={c.name}>{c.name}</option>
+              ))}
+            </select>
+          </div>
           {/* Cylinder Type Dropdown */}
-          <select
-            value={formData.cylinderType}
-            onChange={(e) => setFormData({ ...formData, cylinderType: e.target.value })}
-            className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
-            required
-          >
-            <option value="">Select Cylinder Type</option>
-            <option value="Small">Small</option>
-            <option value="Large">Large</option>
-          </select>
+          <div>
+            <label htmlFor="cylinderType" className="block mb-1 font-medium text-gray-700">Cylinder Type</label>
+            <select
+              id="cylinderType"
+              value={formData.cylinderType}
+              onChange={(e) => setFormData({ ...formData, cylinderType: e.target.value })}
+              className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+              required
+            >
+              <option value="">Select Cylinder Type</option>
+              <option value="Small">Small</option>
+              <option value="Large">Large</option>
+            </select>
+          </div>
           {/* Show Price Info */}
           {formData.cylinderType && (
             <div className="text-blue-600 font-semibold">
@@ -62,21 +70,29 @@ const RefillForm = ({ onClose }) => {
             </div>
           )}
           {/* Quantity Input */}
-          <input
-            type="number"
-            value={formData.quantity}
-            onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })}
-            min="1"
-            className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
-            required
-          />
+          <div>
+            <label htmlFor="quantity" className="block mb-1 font-medium text-gray-700">Quantity</label>
+            <input
+              id="quantity"
+              type="number"
+              value={formData.quantity}
+              onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })}
+              min="1"
+              className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+              required
+            />
+          </div>
           {/* Date Picker */}
-          <input
-            type="date"
-            value={formData.date}
-            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-            className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
-          />
+          <div>
+            <label htmlFor="date" className="block mb-1 font-medium text-gray-700">Date</label>
+            <input
+              id="date"
+              type="date"
+              value={formData.date}
+              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+            />
+          </div>
           {/* Action Buttons */}
           <div className="flex justify-end gap-2">
             <button type="button" onClick={onClose} className="bg-gray-200 px-6 py-3 rounded-xl font-semibold">Cancel</button>

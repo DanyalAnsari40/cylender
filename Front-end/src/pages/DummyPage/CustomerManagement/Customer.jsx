@@ -17,6 +17,8 @@ const CustomerManagement = () => {
     email: '',
     address: '',
   });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
 
   const fetchCustomers = async () => {
     const res = await axios.get('http://localhost:5000/api/customers');
@@ -43,8 +45,18 @@ const CustomerManagement = () => {
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/api/customers/${id}`);
+    setDeleteId(id);
+    setShowDeleteModal(true);
+  };
+  const confirmDelete = async () => {
+    await axios.delete(`http://localhost:5000/api/customers/${deleteId}`);
     fetchCustomers();
+    setShowDeleteModal(false);
+    setDeleteId(null);
+  };
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setDeleteId(null);
   };
 
   const handleEdit = (customer) => {
@@ -151,6 +163,28 @@ const CustomerManagement = () => {
             <p><strong>Last Purchase:</strong> {selectedCustomer.lastPurchase}</p>
             <div className="mt-4 text-right">
               <Button onClick={() => setSelectedCustomer(null)} size="md">Close</Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm border border-blue-100 relative animate-fade-in">
+            <h2 className="text-xl font-bold text-red-700 mb-4 text-center">Confirm Delete</h2>
+            <p className="mb-6 text-center">Are you sure you want to delete this customer?</p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={confirmDelete}
+                className="bg-gradient-to-r from-red-600 to-red-400 hover:from-red-700 hover:to-red-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                Delete
+              </button>
+              <button
+                onClick={cancelDelete}
+                className="bg-gray-200 px-6 py-3 rounded-xl font-semibold"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>

@@ -6,8 +6,8 @@ export const assignStock = createAsyncThunk(
   'assignedStock/assignStock',
   async (stockData, { rejectWithValue }) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/stock-assignments', stockData);
-      return response.data;
+      const response = await axios.post('http://localhost:5000/api/employees/assign-stock', stockData);
+      return { employeeId: stockData.employeeId, type: stockData.type, qty: stockData.qty };
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
     }
@@ -19,7 +19,7 @@ export const fetchAssignedStock = createAsyncThunk(
   'assignedStock/fetchAssignedStock',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get('http://localhost:5000/api/stock-assignments');
+      const response = await axios.get('http://localhost:5000/api/employees/assigned-stock');
       return response.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);

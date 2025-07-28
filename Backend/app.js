@@ -11,6 +11,7 @@ import refillRoutes from './Routes/refillRoutes.js';
 import returnRoutes from './Routes/returnRoutes.js';
 import saleRoutes from './Routes/saleRoutes.js';
 import employeeRoutes from './Routes/employeeRoutes.js';
+import productRoutes from './Routes/productRoutes.js';
 import connectDB from './config/db.js';
 
 
@@ -34,6 +35,7 @@ app.use('/api/refills', refillRoutes);
 app.use('/api/returns', returnRoutes);
 app.use('/api/sales', saleRoutes);
 app.use('/api/employees', employeeRoutes);
+app.use('/api/products', productRoutes);
 
 
 

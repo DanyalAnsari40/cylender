@@ -3,7 +3,8 @@ import TabNavigation from './EmployeeTabs';
 import EmployeeTable from './EmployeeList';
 import AddEmployeeModal from './AddEmployeeModal';
 import Button from '../../../components/Button';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { assignStock, fetchAssignedStock, selectAssignedStock } from '../../../features/EmployeesSlice/assignedStockSlice';
 
 const STOCK_TYPES = [
   { label: 'Cylinder', value: 'cylinder' },
@@ -27,10 +28,20 @@ const EmployeeManagement = () => {
 
   // Use Redux for employees
   const employees = useSelector(state => state.employees.list);
+  const assignedStock = useSelector(selectAssignedStock);
   const [formData, setFormData] = useState({});
   const [editingEmployeeId, setEditingEmployeeId] = useState(null);
 
   const [assignments, setAssignments] = useState([]);
+
+  const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    // Fetch assigned stock when component mounts
+    if (typeof dispatch !== 'undefined') {
+      dispatch(fetchAssignedStock());
+    }
+  }, []);
 
   const handleAddOrUpdateEmployee = (employee) => {
     if (editingEmployeeId) {
@@ -95,27 +106,14 @@ const EmployeeManagement = () => {
     setShowAddModal(true);
   };
 
-  const handleAssignStock = () => {
+  const handleAssignStock = async () => {
     if (!assigningTo || !stockForm.type || !stockForm.qty) return;
-    // This part of the logic needs to be adapted to Redux if setEmployees is removed
-    // For now, we'll keep it as is, but it might not work as expected without setEmployees
-    // The original code had setEmployees(prev => prev.map(emp => { ... })) which is removed.
-    // This function will likely need to be refactored to dispatch an action.
-    // For now, we'll just set the form data and editing ID.
-    // The actual update of the employee list in Redux will happen elsewhere.
-    // setEmployees(prev => prev.map(emp => {
-    //   if (emp._id === assigningTo._id) {
-    //     const prevStock = emp.stock || [];
-    //     const idx = prevStock.findIndex(s => s.type === stockForm.type);
-    //     if (idx > -1) {
-    //       prevStock[idx].qty += Number(stockForm.qty);
-    //     } else {
-    //       prevStock.push({ type: stockForm.type, qty: Number(stockForm.qty) });
-    //     }
-    //     return { ...emp, stock: [...prevStock] };
-    //   }
-    //   return emp;
-    // })); // This line is removed as per the new_code
+    await dispatch(assignStock({
+      employeeId: assigningTo._id,
+      type: stockForm.type,
+      qty: Number(stockForm.qty)
+    }));
+    await dispatch(fetchAssignedStock());
     setNotification({ type: 'success', message: `Assigned ${stockForm.qty} ${stockForm.type}(s) to ${assigningTo.name}` });
     setAssigningTo(null);
     setStockForm({ type: '', qty: '' });
@@ -145,6 +143,16 @@ const EmployeeManagement = () => {
     setReturningFrom(null);
     setStockForm({ type: '', qty: '' });
     setTimeout(() => setNotification(null), 3000);
+  };
+
+  // Helper to get assigned stock for an employee (breakdown by type)
+  const getAssignedStockString = (employeeId) => {
+    const stockEntry = assignedStock.find(s => s.employeeId === employeeId);
+    if (!stockEntry || !stockEntry.stock || stockEntry.stock.length === 0) return '0';
+    return stockEntry.stock
+      .filter(s => s && typeof s.qty === 'number' && typeof s.type === 'string' && s.type.length > 0)
+      .map(s => `${s.qty} ${s.type.charAt(0).toUpperCase() + s.type.slice(1)}`)
+      .join(', ');
   };
 
   return (
@@ -202,17 +210,19 @@ const EmployeeManagement = () => {
             <table className="w-full text-sm bg-white rounded-xl overflow-hidden">
               <thead className="bg-blue-50 text-blue-700">
                 <tr>
-                  <th className="p-3 text-left">Name</th>
-                  <th>Email</th>
-                  <th>Actions</th>
+                  <th className="p-3 text-left align-middle">Name</th>
+                  <th className="p-3 text-center align-middle">Email</th>
+                  <th className="p-3 text-center align-middle">Assigned Stock</th>
+                  <th className="p-3 text-center align-middle">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {employees.map(emp => (
                   <tr key={emp._id} className="border-b hover:bg-blue-50">
-                    <td className="p-3 font-medium">{emp.name}</td>
-                    <td>{emp.email}</td>
-                    <td>
+                    <td className="p-3 font-medium align-middle">{emp.name}</td>
+                    <td className="p-3 text-center align-middle">{emp.email}</td>
+                    <td className="p-3 text-center align-middle font-semibold">{getAssignedStockString(emp._id)}</td>
+                    <td className="p-3 text-center align-middle">
                       <button
                         className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white px-3 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200 mr-2"
                         onClick={() => { setAssigningTo(emp); setStockForm({ type: '', qty: '' }); }}

@@ -158,6 +158,7 @@ const DepositForm = ({ onClose }) => {
                   name="checkNumber"
                   value={formData.checkNumber}
                   onChange={handleChange}
+                  required
                   className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
                   placeholder="Enter check number"
                 />
@@ -169,25 +170,42 @@ const DepositForm = ({ onClose }) => {
                   name="bankName"
                   value={formData.bankName}
                   onChange={handleChange}
+                  required
                   className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
                   placeholder="Enter bank name"
                 />
               </div>
+              <div>
+                <label className="block mb-1 font-medium text-gray-700">Item Name</label>
+                <input
+                  type="text"
+                  name="itemName"
+                  value={formData.itemName}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                  placeholder="Enter item name"
+                />
+              </div>
             </>
           )}
-          {/* Item Name */}
-          <div>
-            <label className="block mb-1 font-medium text-gray-700">Item Name</label>
-            <input
-              type="text"
-              name="itemName"
-              value={formData.itemName}
-              onChange={handleChange}
-              required
-              className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
-              placeholder="Enter item name"
-            />
-          </div>
+          {/* Item Name - only show if not Cheque (optional, remove if not needed) */}
+          {/*
+          {formData.paymentMethod !== 'Cheque' && (
+            <div>
+              <label className="block mb-1 font-medium text-gray-700">Item Name</label>
+              <input
+                type="text"
+                name="itemName"
+                value={formData.itemName}
+                onChange={handleChange}
+                required
+                className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 focus:bg-white"
+                placeholder="Enter item name"
+              />
+            </div>
+          )}
+          */}
           {/* Action Buttons */}
           <div className="md:col-span-2 flex justify-end gap-2">
             <button type="button" onClick={onClose} className="bg-gray-200 px-6 py-3 rounded-xl font-semibold">Cancel</button>
