@@ -29,17 +29,15 @@ const NotificationBell = () => {
   useEffect(() => {
     if (user) {
       // Fetch notifications and unread count on component mount
-      // Temporarily disabled due to backend issues
-      // dispatch(fetchNotifications({ recipientId, recipientRole }));
-      // dispatch(fetchUnreadCount({ recipientId, recipientRole }));
-      
-      // Set up polling for new notifications every 30 seconds
-      // Temporarily disabled due to backend issues
-      // const interval = setInterval(() => {
-      //   dispatch(fetchUnreadCount({ recipientId, recipientRole }));
-      // }, 30000);
+      dispatch(fetchNotifications({ recipientId, recipientRole }));
+      dispatch(fetchUnreadCount({ recipientId, recipientRole }));
 
-      // return () => clearInterval(interval);
+      // Set up polling for new notifications every 30 seconds
+      const interval = setInterval(() => {
+        dispatch(fetchUnreadCount({ recipientId, recipientRole }));
+      }, 30000);
+
+      return () => clearInterval(interval);
     }
   }, [dispatch, user, recipientId, recipientRole]);
 
@@ -58,8 +56,7 @@ const NotificationBell = () => {
   const handleToggleNotifications = () => {
     dispatch(toggleNotifications());
     if (!isOpen && user) {
-      // Temporarily disabled due to backend issues
-      // dispatch(fetchNotifications({ recipientId, recipientRole }));
+      dispatch(fetchNotifications({ recipientId, recipientRole }));
     }
   };
 

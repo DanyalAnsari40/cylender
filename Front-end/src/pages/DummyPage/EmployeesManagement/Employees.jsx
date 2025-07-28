@@ -31,6 +31,7 @@ const EmployeeManagement = () => {
   const employees = useSelector(state => state.employees.list);
   const assignedStock = useSelector(selectAssignedStock);
   const returnedStock = useSelector(selectReturnedStock);
+  const user = useSelector(state => state.auth.user);
   
   // Debug: log returnedStock to check data (moved after declaration)
   console.log('Returned stock:', returnedStock);
@@ -278,18 +279,20 @@ const EmployeeManagement = () => {
                     <td className="p-3 text-center align-middle font-semibold">{getReturnedStockString(emp._id)}</td>
                     <td className="p-3 text-center align-middle">
                       <div className="flex gap-2 justify-center">
-                      <button
-                          className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white px-3 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200"
-                        onClick={() => { setAssigningTo(emp); setStockForm({ type: '', qty: '' }); }}
-                      >
-                        Assign
-                      </button>
                         <button
-                          className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-3 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200"
-                          onClick={() => { setReturningFrom(emp); setStockForm({ type: '', qty: '' }); }}
+                          className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white px-3 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+                          onClick={() => { setAssigningTo(emp); setStockForm({ type: '', qty: '' }); }}
                         >
-                          Return
+                          Assign
                         </button>
+                        {user?.role !== 'admin' && (
+                          <button
+                            className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-3 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+                            onClick={() => { setReturningFrom(emp); setStockForm({ type: '', qty: '' }); }}
+                          >
+                            Return
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

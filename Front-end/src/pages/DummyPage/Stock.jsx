@@ -5,6 +5,7 @@ import Input from '../../components/Input.jsx';
 
 const API_URL = 'http://localhost:5000/api/employees/assigned-stock';
 const RETURN_URL = 'http://localhost:5000/api/employees/return-stock';
+const RETURNED_URL = 'http://localhost:5000/api/employees/returned-stock';
 
 const Stock = () => {
   const user = useSelector((state) => state.auth.user);
@@ -14,17 +15,21 @@ const Stock = () => {
   const [showReturn, setShowReturn] = useState(false);
   const [returnType, setReturnType] = useState('');
   const [returnQty, setReturnQty] = useState('');
+  const [returnedStock, setReturnedStock] = useState([]);
 
   const fetchStock = async () => {
     setLoading(true);
     try {
+      // Fetch assigned stock
       const res = await fetch(API_URL);
       const data = await res.json();
-      console.log('Fetched assigned stock:', data);
-      console.log('Current user._id:', user._id);
-      // Find this employee's stock
       const emp = data.find((e) => e.employeeId === user._id);
       setStock(emp ? emp.stock : []);
+      // Fetch returned stock
+      const retRes = await fetch(RETURNED_URL);
+      const retData = await retRes.json();
+      const retEmp = retData.find((e) => e.employeeId === user._id);
+      setReturnedStock(retEmp ? retEmp.returned : []);
     } catch (err) {
       setError('Failed to fetch stock');
     }
@@ -47,9 +52,27 @@ const Stock = () => {
     setShowReturn(true);
   };
 
+  // Helper: get total returned for a type
+  const getTotalReturned = (type) => {
+    const entry = returnedStock.find(r => r.type === type);
+    return entry ? entry.qty : 0;
+  };
+
+  // Helper: get available stock for a type
+  const getAvailableStock = (type) => {
+    const assigned = stock.find(s => s.type === type)?.qty || 0;
+    const returned = getTotalReturned(type);
+    return assigned - returned;
+  };
+
   const submitReturn = async (e) => {
     e.preventDefault();
     setError('');
+    const available = getAvailableStock(returnType);
+    if (Number(returnQty) > available) {
+      setError(`You can only return up to ${available} ${returnType}(s).`);
+      return;
+    }
     try {
       const res = await fetch(RETURN_URL, {
         method: 'POST',
@@ -58,10 +81,8 @@ const Stock = () => {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Failed to return stock');
-      
       // Show success message
       alert(`Successfully returned ${returnQty} ${returnType}(s) to admin!`);
-      
       setShowReturn(false);
       setReturnQty('');
       fetchStock();
@@ -90,7 +111,9 @@ const Stock = () => {
             <thead>
               <tr className="border-b bg-blue-50 text-blue-700 uppercase text-sm font-semibold">
                 <th className="p-4">Type</th>
-                <th className="p-4">Quantity</th>
+                <th className="p-4">Assigned</th>
+                <th className="p-4">Total Returns</th>
+                <th className="p-4">Available</th>
                 <th className="p-4">Actions</th>
               </tr>
             </thead>
@@ -99,6 +122,8 @@ const Stock = () => {
                 <tr key={s.type} className="border-b hover:bg-blue-50 transition-colors duration-200">
                   <td className="p-4 font-medium">{s.type}</td>
                   <td className="p-4">{s.qty}</td>
+                  <td className="p-4">{getTotalReturned(s.type)}</td>
+                  <td className="p-4">{getAvailableStock(s.type)}</td>
                   <td className="p-4">
                     <Button onClick={() => handleReturn(s.type)} size="sm" variant="secondary">Return to Admin</Button>
                   </td>
@@ -121,7 +146,7 @@ const Stock = () => {
                 onChange={e => setReturnQty(e.target.value)} 
                 required 
                 min={1}
-                max={stock.find(s => s.type === returnType)?.qty || 1}
+                max={getAvailableStock(returnType) || 1}
               />
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="secondary" onClick={() => setShowReturn(false)} size="md">Cancel</Button>
