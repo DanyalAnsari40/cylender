@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 3px; white-space: pre-wrap; }
+        input { padding: 5px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>API Test Page</h1>
+    
+    <div class="test-section">
+        <h3>1. Get All Employees</h3>
+        <button onclick="getEmployees()">Get Employees</button>
+        <div id="employees-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. Get Assigned Stock</h3>
+        <button onclick="getAssignedStock()">Get Assigned Stock</button>
+        <div id="assigned-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. Get Returned Stock</h3>
+        <button onclick="getReturnedStock()">Get Returned Stock</button>
+        <div id="returned-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>4. Test Return Stock</h3>
+        <input type="text" id="employeeId" placeholder="Employee ID" value="6887c2e783d7fcf90a6d23b3">
+        <input type="text" id="stockType" placeholder="Stock Type" value="cylinder">
+        <input type="number" id="stockQty" placeholder="Quantity" value="3">
+        <button onclick="testReturnStock()">Test Return Stock</button>
+        <div id="return-test-result" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                const data = await response.json();
+                return { success: true, data, status: response.status };
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+        
+        async function getEmployees() {
+            const result = await makeRequest(`${API_BASE}/employees`);
+            document.getElementById('employees-result').textContent = 
+                JSON.stringify(result, null, 2);
+        }
+        
+        async function getAssignedStock() {
+            const result = await makeRequest(`${API_BASE}/employees/assigned-stock`);
+            document.getElementById('assigned-result').textContent = 
+                JSON.stringify(result, null, 2);
+        }
+        
+        async function getReturnedStock() {
+            const result = await makeRequest(`${API_BASE}/employees/returned-stock`);
+            document.getElementById('returned-result').textContent = 
+                JSON.stringify(result, null, 2);
+        }
+        
+        async function testReturnStock() {
+            const employeeId = document.getElementById('employeeId').value;
+            const type = document.getElementById('stockType').value;
+            const qty = document.getElementById('stockQty').value;
+            
+            const result = await makeRequest(`${API_BASE}/employees/return-stock`, {
+                method: 'POST',
+                body: JSON.stringify({ employeeId, type, qty: Number(qty) })
+            });
+            
+            document.getElementById('return-test-result').textContent = 
+                JSON.stringify(result, null, 2);
+        }
+    </script>
+</body>
+</html> 

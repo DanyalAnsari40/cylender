@@ -5,6 +5,7 @@ import AddEmployeeModal from './AddEmployeeModal';
 import Button from '../../../components/Button';
 import { useSelector, useDispatch } from 'react-redux';
 import { assignStock, fetchAssignedStock, selectAssignedStock } from '../../../features/EmployeesSlice/assignedStockSlice';
+import { fetchReturnedStock, returnStockFromEmployee, selectReturnedStock } from '../../../features/EmployeesSlice/returnedStockSlice';
 
 const STOCK_TYPES = [
   { label: 'Cylinder', value: 'cylinder' },
@@ -29,6 +30,12 @@ const EmployeeManagement = () => {
   // Use Redux for employees
   const employees = useSelector(state => state.employees.list);
   const assignedStock = useSelector(selectAssignedStock);
+  const returnedStock = useSelector(selectReturnedStock);
+  
+  // Debug: log returnedStock to check data (moved after declaration)
+  console.log('Returned stock:', returnedStock);
+  console.log('Returned stock length:', returnedStock?.length);
+  console.log('Returned stock structure:', JSON.stringify(returnedStock, null, 2));
   const [formData, setFormData] = useState({});
   const [editingEmployeeId, setEditingEmployeeId] = useState(null);
 
@@ -37,11 +44,12 @@ const EmployeeManagement = () => {
   const dispatch = useDispatch();
 
   React.useEffect(() => {
-    // Fetch assigned stock when component mounts
+    // Fetch assigned and returned stock when component mounts
     if (typeof dispatch !== 'undefined') {
       dispatch(fetchAssignedStock());
+      dispatch(fetchReturnedStock());
     }
-  }, []);
+  }, [dispatch]);
 
   const handleAddOrUpdateEmployee = (employee) => {
     if (editingEmployeeId) {
@@ -120,29 +128,35 @@ const EmployeeManagement = () => {
     setTimeout(() => setNotification(null), 3000);
   };
 
-  const handleReturnStock = () => {
+  const handleReturnStock = async () => {
     if (!returningFrom || !stockForm.type || !stockForm.qty) return;
-    // This part of the logic needs to be adapted to Redux if setEmployees is removed
-    // For now, we'll keep it as is, but it might not work as expected without setEmployees
-    // The original code had setEmployees(prev => prev.map(emp => { ... })) which is removed.
-    // This function will likely need to be refactored to dispatch an action.
-    // For now, we'll just set the form data and editing ID.
-    // The actual update of the employee list in Redux will happen elsewhere.
-    // setEmployees(prev => prev.map(emp => {
-    //   if (emp._id === returningFrom._id) {
-    //     const prevStock = emp.stock || [];
-    //     const idx = prevStock.findIndex(s => s.type === stockForm.type);
-    //     if (idx > -1) {
-    //       prevStock[idx].qty = Math.max(0, prevStock[idx].qty - Number(stockForm.qty));
-    //     }
-    //     return { ...emp, stock: [...prevStock] };
-    //   }
-    //   return emp;
-    // })); // This line is removed as per the new_code
-    setNotification({ type: 'info', message: `${returningFrom.name} returned ${stockForm.qty} ${stockForm.type}(s)` });
+    
+    try {
+      console.log('Returning stock:', {
+        employeeId: returningFrom._id,
+        type: stockForm.type,
+        qty: Number(stockForm.qty)
+      });
+      
+      await dispatch(returnStockFromEmployee({
+        employeeId: returningFrom._id,
+        type: stockForm.type,
+        qty: Number(stockForm.qty)
+      }));
+      
+      // Refresh the returned stock data
+      console.log('Refreshing returned stock data...');
+      await dispatch(fetchReturnedStock());
+      
+      setNotification({ type: 'success', message: `${returningFrom.name} returned ${stockForm.qty} ${stockForm.type}(s)` });
     setReturningFrom(null);
     setStockForm({ type: '', qty: '' });
     setTimeout(() => setNotification(null), 3000);
+    } catch (error) {
+      console.error('Error returning stock:', error);
+      setNotification({ type: 'error', message: 'Failed to return stock' });
+      setTimeout(() => setNotification(null), 3000);
+    }
   };
 
   // Helper to get assigned stock for an employee (breakdown by type)
@@ -153,6 +167,44 @@ const EmployeeManagement = () => {
       .filter(s => s && typeof s.qty === 'number' && typeof s.type === 'string' && s.type.length > 0)
       .map(s => `${s.qty} ${s.type.charAt(0).toUpperCase() + s.type.slice(1)}`)
       .join(', ');
+  };
+
+  // Helper to get returned stock for an employee (breakdown by type)
+  const getReturnedStockString = (employeeId) => {
+    console.log('Getting returned stock for employee:', employeeId);
+    console.log('Available returned stock data:', returnedStock);
+    
+    // Try to find the employee in the returned stock data
+    const entry = returnedStock.find(s => s.employeeId === employeeId || s._id === employeeId);
+    console.log('Found entry for employee:', entry);
+    
+    if (!entry) {
+      console.log('No entry found for employee:', employeeId);
+      return '0';
+    }
+    
+    // Check if the entry has returned stock
+    if (!entry.returned || !Array.isArray(entry.returned) || entry.returned.length === 0) {
+      console.log('No returned stock array found for employee:', employeeId);
+      return '0';
+    }
+    
+    // Filter and format the returned stock
+    const validReturnedStock = entry.returned.filter(s => 
+      s && typeof s.qty === 'number' && s.qty > 0 && typeof s.type === 'string' && s.type.length > 0
+    );
+    
+    if (validReturnedStock.length === 0) {
+      console.log('No valid returned stock found for employee:', employeeId);
+      return '0';
+    }
+    
+    const result = validReturnedStock
+      .map(s => `${s.qty} ${s.type.charAt(0).toUpperCase() + s.type.slice(1)}`)
+      .join(', ');
+    
+    console.log('Returned stock string for employee:', employeeId, '=', result);
+    return result;
   };
 
   return (
@@ -213,6 +265,7 @@ const EmployeeManagement = () => {
                   <th className="p-3 text-left align-middle">Name</th>
                   <th className="p-3 text-center align-middle">Email</th>
                   <th className="p-3 text-center align-middle">Assigned Stock</th>
+                  <th className="p-3 text-center align-middle">Returned Stock from Employee</th>
                   <th className="p-3 text-center align-middle">Actions</th>
                 </tr>
               </thead>
@@ -222,19 +275,22 @@ const EmployeeManagement = () => {
                     <td className="p-3 font-medium align-middle">{emp.name}</td>
                     <td className="p-3 text-center align-middle">{emp.email}</td>
                     <td className="p-3 text-center align-middle font-semibold">{getAssignedStockString(emp._id)}</td>
+                    <td className="p-3 text-center align-middle font-semibold">{getReturnedStockString(emp._id)}</td>
                     <td className="p-3 text-center align-middle">
+                      <div className="flex gap-2 justify-center">
                       <button
-                        className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white px-3 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200 mr-2"
+                          className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white px-3 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200"
                         onClick={() => { setAssigningTo(emp); setStockForm({ type: '', qty: '' }); }}
                       >
                         Assign
                       </button>
-                      <button
-                        className="bg-gradient-to-r from-yellow-500 to-red-500 hover:from-yellow-600 hover:to-red-600 text-white px-3 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200"
-                        onClick={() => { setReturningFrom(emp); setStockForm({ type: '', qty: '' }); }}
-                      >
-                        Return
-                      </button>
+                        <button
+                          className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-3 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+                          onClick={() => { setReturningFrom(emp); setStockForm({ type: '', qty: '' }); }}
+                        >
+                          Return
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -351,9 +407,9 @@ const EmployeeManagement = () => {
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-yellow-500 to-red-500 hover:from-yellow-600 hover:to-red-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="w-full bg-gradient-to-r from-orange-600 to-red-500 hover:from-orange-700 hover:to-red-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
                 >
-                  Return
+                  Return Stock
                 </button>
               </form>
             </div>
@@ -362,7 +418,8 @@ const EmployeeManagement = () => {
         {/* Notification Toast */}
         {notification && (
           <div className={`fixed top-8 right-8 z-[100] px-6 py-4 rounded-xl shadow-lg font-semibold text-white transition-all duration-300 ${
-            notification.type === 'success' ? 'bg-green-600' : 'bg-blue-600'
+            notification.type === 'success' ? 'bg-green-600' : 
+            notification.type === 'error' ? 'bg-red-600' : 'bg-blue-600'
           }`}>
             {notification.message}
           </div>

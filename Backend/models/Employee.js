@@ -12,6 +12,13 @@ const employeeSchema = new mongoose.Schema(
         qty: { type: Number, required: true, default: 0 }
       }
     ],
+    // Track returned stock from employee to admin
+    returned: [
+      {
+        type: { type: String, enum: ['cylinder', 'gas'], required: true },
+        qty: { type: Number, required: true, default: 0 }
+      }
+    ],
     role: { type: String, default: 'employee' } 
   },
   { timestamps: true }

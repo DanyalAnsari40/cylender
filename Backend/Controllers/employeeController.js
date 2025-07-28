@@ -1,5 +1,27 @@
 import Employee from '../models/Employee.js';
 
+// GET /api/employees/returned-stock
+export const getReturnedStock = async (req, res) => {
+  try {
+    console.log('Fetching returned stock for all employees...');
+    const employees = await Employee.find({}, 'name email returned');
+    console.log('Found employees:', employees.length);
+    
+    const data = employees.map(emp => ({
+      employeeId: emp._id,
+      name: emp.name,
+      email: emp.email,
+      returned: emp.returned
+    }));
+    
+    console.log('Returned stock data:', JSON.stringify(data, null, 2));
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching returned stock:', error);
+    res.status(500).json({ message: 'Failed to fetch returned stock' });
+  }
+};
+
 export const addEmployee = async (req, res) => {
   try {
     const newEmp = new Employee(req.body);
@@ -43,6 +65,7 @@ export const assignStock = async (req, res) => {
     const { employeeId, type, qty } = req.body;
     const employee = await Employee.findById(employeeId);
     if (!employee) return res.status(404).json({ message: 'Employee not found' });
+    
     // Find if this type already exists
     const stockIdx = employee.stock.findIndex(s => s.type === type);
     if (stockIdx > -1) {
@@ -53,6 +76,28 @@ export const assignStock = async (req, res) => {
       employee.stock.push({ type, qty: Number(qty) });
     }
     await employee.save();
+    
+    // Create notification for employee
+    try {
+      const Notification = (await import('../models/Notification.js')).default;
+      await Notification.create({
+        recipientId: employeeId,
+        recipientRole: 'employee',
+        senderId: 'admin',
+        senderName: 'Admin',
+        type: 'stock_assigned',
+        title: 'Stock Assigned',
+        message: `You have been assigned ${qty} ${type}(s)`,
+        details: {
+          stockType: type,
+          quantity: qty,
+          employeeName: employee.name
+        }
+      });
+    } catch (notifError) {
+      console.error('Failed to create notification:', notifError);
+    }
+    
     res.json(employee.stock);
   } catch (error) {
     res.status(500).json({ message: 'Failed to assign stock' });
@@ -73,19 +118,51 @@ export const getAssignedStock = async (req, res) => {
 export const returnStock = async (req, res) => {
   try {
     const { employeeId, type, qty } = req.body;
+    console.log('Return stock request:', { employeeId, type, qty });
+    
     const employee = await Employee.findById(employeeId);
     if (!employee) return res.status(404).json({ message: 'Employee not found' });
-    const stockIdx = employee.stock.findIndex(s => s.type === type);
-    if (stockIdx === -1 || employee.stock[stockIdx].qty < qty) {
-      return res.status(400).json({ message: 'Not enough stock to return' });
+
+    console.log('Employee found:', employee.name);
+    console.log('Current returned stock:', employee.returned);
+
+    // Only update the returned array
+    const retIdx = employee.returned.findIndex(r => r.type === type);
+    if (retIdx > -1) {
+      employee.returned[retIdx].qty += Number(qty);
+      console.log('Updated existing returned stock:', employee.returned[retIdx]);
+    } else {
+      employee.returned.push({ type, qty: Number(qty) });
+      console.log('Added new returned stock:', { type, qty: Number(qty) });
     }
-    employee.stock[stockIdx].qty -= Number(qty);
-    if (employee.stock[stockIdx].qty === 0) {
-      employee.stock.splice(stockIdx, 1);
-    }
+    
     await employee.save();
-    res.json(employee.stock);
+    console.log('Employee saved. Updated returned stock:', employee.returned);
+    
+    // Create notification for admin
+    try {
+      const Notification = (await import('../models/Notification.js')).default;
+      await Notification.create({
+        recipientId: 'admin',
+        recipientRole: 'admin',
+        senderId: employeeId,
+        senderName: employee.name,
+        type: 'stock_returned',
+        title: 'Stock Returned',
+        message: `${employee.name} has returned ${qty} ${type}(s)`,
+        details: {
+          stockType: type,
+          quantity: qty,
+          employeeName: employee.name
+        }
+      });
+    } catch (notifError) {
+      console.error('Failed to create notification:', notifError);
+    }
+    
+    res.json(employee.returned);
   } catch (error) {
+    console.error('Error in returnStock:', error);
     res.status(500).json({ message: 'Failed to return stock' });
   }
 };

@@ -37,6 +37,12 @@ const Stock = () => {
   }, []);
 
   const handleReturn = (type) => {
+    // Find the current stock for this type
+    const currentStock = stock.find(s => s.type === type);
+    if (!currentStock || currentStock.qty <= 0) {
+      alert('No stock available to return for this type.');
+      return;
+    }
     setReturnType(type);
     setShowReturn(true);
   };
@@ -52,6 +58,10 @@ const Stock = () => {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Failed to return stock');
+      
+      // Show success message
+      alert(`Successfully returned ${returnQty} ${returnType}(s) to admin!`);
+      
       setShowReturn(false);
       setReturnQty('');
       fetchStock();
@@ -70,6 +80,7 @@ const Stock = () => {
       </div>
       <div className="bg-white border border-blue-100 rounded-2xl p-8 overflow-x-auto shadow-xl mt-8">
         <h2 className="text-2xl font-bold mb-6 text-blue-700">Assigned Stock</h2>
+        <p className="text-gray-600 mb-4">Welcome, {user.name || user.email}! Here's your assigned stock. You can return any stock back to admin using the Return button.</p>
         {loading ? (
           <div>Loading...</div>
         ) : stock.length === 0 ? (
@@ -103,7 +114,15 @@ const Stock = () => {
             <h2 className="text-2xl font-bold mb-6 text-blue-700">Return Stock</h2>
             <form onSubmit={submitReturn} className="space-y-4">
               <Input label="Type" value={returnType} disabled />
-              <Input label="Quantity to Return" type="number" value={returnQty} onChange={e => setReturnQty(e.target.value)} required min={1} />
+              <Input 
+                label="Quantity to Return" 
+                type="number" 
+                value={returnQty} 
+                onChange={e => setReturnQty(e.target.value)} 
+                required 
+                min={1}
+                max={stock.find(s => s.type === returnType)?.qty || 1}
+              />
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="secondary" onClick={() => setShowReturn(false)} size="md">Cancel</Button>
                 <Button type="submit" variant="primary" size="md">Return</Button>

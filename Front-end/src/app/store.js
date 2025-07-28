@@ -12,6 +12,8 @@ import employeeReducer from '../features/EmployeesSlice/Employees'
 import authReducer from '../features/auth/authSlice'
 import analyticsReducer from '../features/Report/ReportSlice';
 import assignedStockReducer from '../features/EmployeesSlice/assignedStockSlice';
+import returnedStockReducer from '../features/EmployeesSlice/returnedStockSlice';
+import notificationReducer from '../features/notifications/notificationSlice';
 
 
 export const store = configureStore({
@@ -28,12 +30,8 @@ export const store = configureStore({
     employees: employeeReducer,
     auth: authReducer,
     analytics: analyticsReducer,
-        assignedStock: assignedStockReducer,
-
-
-
-
-
-
+    assignedStock: assignedStockReducer,
+    returnedStock: returnedStockReducer,
+    notifications: notificationReducer,
   },
 });

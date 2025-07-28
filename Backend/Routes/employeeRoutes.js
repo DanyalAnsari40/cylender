@@ -7,7 +7,8 @@ import {
   updateEmployee,
   assignStock,
   getAssignedStock,
-  returnStock
+  returnStock,
+  getReturnedStock
 } from '../Controllers/employeeController.js';
 
 const router = express.Router();
@@ -18,6 +19,7 @@ router.put('/:id', updateEmployee);
 router.delete('/:id', deleteEmployee);
 router.post('/assign-stock', assignStock);
 router.get('/assigned-stock', getAssignedStock);
+router.get('/returned-stock', getReturnedStock);
 router.post('/return-stock', returnStock);
 
 export default router;

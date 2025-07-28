@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
-import { FiMenu, FiBell, FiUser, FiLogOut } from 'react-icons/fi';
+import { FiMenu, FiUser, FiLogOut } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleSidebar } from '../features/ui/uiSlice';
 import { logout } from '../features/auth/authSlice';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import NotificationBell from '../components/NotificationBell/NotificationBell';
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -53,11 +54,7 @@ const Navbar = () => {
       </div>
       <div className="flex items-center gap-4">
         {/* Notifications */}
-        <button className="relative p-2 rounded-full hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-200" aria-label="Notifications">
-          <FiBell className="text-xl text-blue-600" />
-          {/* Notification dot */}
-          <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-        </button>
+        <NotificationBell />
         {/* User menu */}
         <div className="relative" ref={menuRef}>
           <button
