@@ -69,3 +69,23 @@ export const getAssignedStock = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch assigned stock' });
   }
 };
+
+export const returnStock = async (req, res) => {
+  try {
+    const { employeeId, type, qty } = req.body;
+    const employee = await Employee.findById(employeeId);
+    if (!employee) return res.status(404).json({ message: 'Employee not found' });
+    const stockIdx = employee.stock.findIndex(s => s.type === type);
+    if (stockIdx === -1 || employee.stock[stockIdx].qty < qty) {
+      return res.status(400).json({ message: 'Not enough stock to return' });
+    }
+    employee.stock[stockIdx].qty -= Number(qty);
+    if (employee.stock[stockIdx].qty === 0) {
+      employee.stock.splice(stockIdx, 1);
+    }
+    await employee.save();
+    res.json(employee.stock);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to return stock' });
+  }
+};

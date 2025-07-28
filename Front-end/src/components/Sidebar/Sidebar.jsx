@@ -119,7 +119,11 @@ const Sidebar = () => {
           {['employee'].includes(role) && (
             <>
               <SidebarLink icon={<FiActivity />} label="Inventory" to={role === 'admin' ? '/inventory' : '/inventorysys'} animate />
-              <SidebarLink icon={<FiUsers />} label="Employees" to={role === 'admin' ? '/employees' : '/employee-management'} animate />
+              <SidebarLink icon={<FiBox />} label="Stock" to="/stock" animate />
+              {/* Remove Employees link for employees */}
+              {/* Add Sales and Debt/Credit links for employees */}
+              <SidebarLink icon={<FiTrendingUp />} label="Sales" to="/sales" animate />
+              <SidebarLink icon={<FiPieChart />} label="Debt/Credit" to="/debt-credit" animate />
               <SidebarLink icon={<FiFileText />} label="Reports" to={role === 'admin' ? '/reports' : '/report-sys'} animate badge={pendingReports} />
             </>
           )}

@@ -40,7 +40,7 @@ const Login = () => {
         (emp) => emp.email === email && emp.password === password && emp.role === 'employee'
       );
       if (matchedEmployee) {
-        dispatch(login({ user: matchedEmployee.email, role: matchedEmployee.role }));
+        dispatch(login(matchedEmployee));
         navigate('/');
       } else {
         setError('Invalid employee credentials!');

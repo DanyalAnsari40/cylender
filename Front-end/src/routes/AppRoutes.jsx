@@ -14,6 +14,7 @@ import ProtectedRoute from '../components/ProtectedRoute/Protected';
 import ReportsDashboard from '../pages/DummyPage/Report/Dasboard';
 import Employee from '../pages/EmployeesComponent/Employees';
 import Product from '../pages/DummyPage/Product';
+import Stock from '../pages/DummyPage/Stock';
 
 const AppRoutes = () => (
   <Routes>
@@ -40,6 +41,9 @@ const AppRoutes = () => (
     <Route path="/products" element={<ProtectedRoute allowedRoles={['admin']}><Product /></ProtectedRoute>} />
         <Route path="/inventory" element={<ProtectedRoute allowedRoles={['admin', 'employee']}><InventoryManagement /></ProtectedRoute>} />
     <Route path="/reports" element={<ProtectedRoute allowedRoles={[ 'admin']}><ReportsDashboard/></ProtectedRoute>} />
+    <Route path="/sales" element={<ProtectedRoute allowedRoles={['employee']}><GasSales /></ProtectedRoute>} />
+    <Route path="/debt-credit" element={<ProtectedRoute allowedRoles={['employee']}><Dummy /></ProtectedRoute>} />
+    <Route path="/stock" element={<ProtectedRoute allowedRoles={['employee']}><Stock /></ProtectedRoute>} />
 
 
     {/* Shared (Admin + Employee) Routes */}
